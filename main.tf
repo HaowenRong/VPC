@@ -77,6 +77,22 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private.id
 }
 
+# nat
+resource "aws_eip" "nat" {
+  domain = "vpc"
+}
+
+resource "aws_nat_gateway" "ngw" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public.id
+
+  tags = {
+    Name = "main_nat_gateway"
+  }
+
+  depends_on = [aws_internet_gateway.igw]
+}
+
 # security groups
 resource "aws_security_group" "ssh_private_sg" {
   name        = "ssh-private-sg"
